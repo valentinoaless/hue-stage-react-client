@@ -72,7 +72,7 @@ const getLights = async (ip, user) => {
   console.log('getting lights');
   console.log(ip, user);
 
-  await axios.get(`http://${ip}/api/${user}/lights/`).then(res => {
+  await axios.get(`${ip}/api/${user}/lights/`).then(res => {
 
       let lights = Object.entries(res.data);
       lights.forEach(light => {
@@ -101,7 +101,7 @@ export const bridge = {
     },
 
     send(light, state, _bridgeIp, _bridgeUser) {
-        axios.put(`http://${_bridgeIp}/api/${_bridgeUser}/lights/${light}/state`, state)
+        axios.put(`${_bridgeIp}/api/${_bridgeUser}/lights/${light}/state`, state)
         .then(res => {
         })
     },
