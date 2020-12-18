@@ -17,12 +17,12 @@ const connectToBridge = async (ip, user) => {
   let connected = false;
 
   if(user) {
-      await axios.get(`http://${ip}/api/${user}`).then(res => {
+      await axios.get(`https://${ip}/api/${user}`).then(res => {
         connected = true;
       })
   } else {
       await createUser(ip).then(async (res) => {
-        await axios.get(`http://${ip}/api/${res}`).then(() => {
+        await axios.get(`https://${ip}/api/${res}`).then(() => {
           bridgeUser = res;
           connected = true;
         })
@@ -40,7 +40,7 @@ const createUser = (ip) => {
     let requestsMade = 0;
     
     let bridgeRequest = setInterval(()=>{
-      axios.post(`http://${ip}/api`, {devicetype: "hue-stage-wep-app"})
+      axios.post(`https://${ip}/api`, {devicetype: "hue-stage-wep-app"})
         .then(res => {
           if (!res.data[0].error) {
             resolve(res.data[0].success.username);
@@ -72,7 +72,7 @@ const getLights = async (ip, user) => {
   console.log('getting lights');
   console.log(ip, user);
 
-  await axios.get(`${ip}/api/${user}/lights/`).then(res => {
+  await axios.get(`https://${ip}/api/${user}/lights/`).then(res => {
 
       let lights = Object.entries(res.data);
       lights.forEach(light => {
@@ -101,7 +101,7 @@ export const bridge = {
     },
 
     send(light, state, _bridgeIp, _bridgeUser) {
-        axios.put(`${_bridgeIp}/api/${_bridgeUser}/lights/${light}/state`, state)
+        axios.put(`https://${_bridgeIp}/api/${_bridgeUser}/lights/${light}/state`, state)
         .then(res => {
         })
     },
