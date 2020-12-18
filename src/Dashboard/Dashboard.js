@@ -63,7 +63,7 @@ const Dashboard = () => {
 
         let loading = true;
 
-        await axios.post('http://localhost:5000/api/user/set/newset', 
+        await axios.post('https://hue-stage.herokuapp.com/api/user/set/newset', 
         {
             setName: newSetName.name,
             timeMethod: timingMethod,

@@ -5,24 +5,32 @@ import Light from './state-model';
 let bridgeUser = "";
 let bridgeIp = '';
 
-const getBridgeIP = () => {
+export const getBridgeIP = () => {
     return axios.get('https://discovery.meethue.com').then(res => {
         bridgeIp = res.data[0].internalipaddress
         return res.data[0].internalipaddress
-    })
+    });
 }
 
-const connectToBridge = (ip, user) => {
+const connectToBridge = async (ip, user) => {
+
+  let connected = false;
+
   if(user) {
-      axios.get(`http://${ip}/api/${user}`).then(res => {
+      await axios.get(`http://${ip}/api/${user}`).then(res => {
+        connected = true;
       })
   } else {
-      createUser(ip).then(res => {
-        axios.get(`http://${ip}/api/${res}`).then(res => {
-          console.log(res);
+      await createUser(ip).then(async (res) => {
+        await axios.get(`http://${ip}/api/${res}`).then(() => {
+          bridgeUser = res;
+          connected = true;
         })
       });
   }
+
+  return connected;
+
 }
 
 const createUser = (ip) => {
@@ -44,7 +52,6 @@ const createUser = (ip) => {
       }).catch(err => {
         console.log(err);
       })
-  
       if(requestsMade > 15) {
         reject('Unable to create user')
         clearInterval(bridgeRequest);
@@ -58,44 +65,55 @@ const createUser = (ip) => {
 
 }
 
+const getLights = async (ip, user) => {
+
+  let reachableLights = [];
+
+  console.log('getting lights');
+  console.log(ip, user);
+
+  await axios.get(`http://${ip}/api/${user}/lights/`).then(res => {
+
+      let lights = Object.entries(res.data);
+      lights.forEach(light => {
+          if(light[1].state.reachable) {
+              reachableLights.push(light);
+          }
+      })
+  })
+  
+  
+  return reachableLights;
+}
+
 export const bridge = {
-    connect: async () => {
-        await getBridgeIP().then(ip => {
-            connectToBridge(ip, bridgeUser)
-        })
+    connect: async (user) => {
+
+      let connected = false;
+      let ip = '';
+
+      await getBridgeIP().then(async (resIp) => {
+          ip = resIp;
+          connected = await connectToBridge(ip, user);
+      })
+
+      return {connected: connected, bridgeUser: bridgeUser || user, bridgeIp: ip};
     },
 
-    send(light, state) {
-        axios.put(`http://${bridgeIp}/api/${bridgeUser}/lights/${light}/state`, state)
+    send(light, state, _bridgeIp, _bridgeUser) {
+        axios.put(`http://${_bridgeIp}/api/${_bridgeUser}/lights/${light}/state`, state)
         .then(res => {
         })
     },
 
-    getLights: async () => {
-
-        let reachableLights = [];
-
-        await axios.get(`http://${bridgeIp}/api/${bridgeUser}/lights/`).then(res => {
-
-            let lights = Object.entries(res.data);
-            lights.map(light => {
-                if(light[1].state.reachable) {
-                    reachableLights.push(light);
-                }
-            })
-        })
-        
-        
-        return reachableLights;
-    },
-
-    loadLights() {
+    loadLights: async (ip, user) => {
 
         let reachableLights = [] 
-        return this.getLights().then(res => {
+        return await getLights(ip, user).then(res => {
             reachableLights = res;
             reachableLights.map(light => {
-                set.push(new Light(light[0], light[1].name, light[1].uniqueid, []))
+                set.push(new Light(light[0], light[1].name, light[1].uniqueid, []));
+                console.log(set);
                 return null;
             })
             return true;

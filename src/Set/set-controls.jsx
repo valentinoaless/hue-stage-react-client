@@ -3,42 +3,16 @@ import styled from 'styled-components';
 import { set } from './data'
 import { bridge } from './bridge'
 import { SetContext } from '../SetContext';
+import { UserContext } from '../UserContext';
 
-// play button
-// pause button
-// tempo
-
-// i.e. tempo = 140, beat happens at second measure (4 beats)
-
-// 1 measure has x beats
-// measure length in ms = /
-
-// tempo == beats in 60s
 let tempo = 120;
 let beatsPerMeasure = 4;
-let beatValue = 4; // 1/4 (quarter)
-
-// get current time and every 50 ms check what objects have a play time before current time
-
-// after copying state and sending, delete those objects from the play time
-
-
-// render all states 
-// when rendering states, make an array with objects
-// each object will have two properties, playTime and an array of all the states
-
-
-
-//disable all controls and dnd interface
-
-/*
-
-
-*/
+let beatValue = 4; 
 
 const SetControls = () => {
     
     let {globalSetData, setGlobalSetData} = useContext(SetContext);
+    let {user, setUser} = useContext(UserContext);
 
     console.log(globalSetData);
 
@@ -90,7 +64,7 @@ const SetControls = () => {
                 });
 
                 messages.map(message => {
-                    bridge.send(message.properties.bridgeIndex, message.properties.state.data())
+                    bridge.send(message.properties.bridgeIndex, message.properties.state.data(), user.bridgeIp, user.bridgeUser);
                     //console.log(message.properties.state, message.properties.bridgeIndex)
                 })
                 

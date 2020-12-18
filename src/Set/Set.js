@@ -3,34 +3,26 @@ import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
 import { set, currentEditorState } from './data'
 import StateCreator from './StateCreator.jsx'
 import './Set.css'
-import { bridge } from './bridge'
+import { bridge, getBridgeIP } from './bridge'
 import SetControls from './set-controls.jsx'
 import { State } from './state-model'
 import { SetContext } from '../SetContext'
 import styled, {keyframes} from 'styled-components';
+import { UserContext } from '../UserContext'
+
 
 
 function Set() {
 
   let {globalSetData, setGlobalSetData} = useContext(SetContext);
+  let {user, setUser} = useContext(UserContext);
 
   let setRef = set;
-  let [lines, setLines] = useState([...set])
-  let [didLoad, setDidLoad] = useState(false)
-
-  useEffect(() => {
-
-    bridge.connect().then(()=>{
-        bridge.loadLights().then(() => {
-            setDidLoad(true);
-            setLines([...set]);
-        }).catch(err => {
-          console.log(err);
-        })
-    })
-
-}, [])
-
+  let [lines, setLines] = useState([...set]);
+  let [didLoad, setDidLoad] = useState(false);
+  let [message, setMessage] = useState('');
+  let [connecting, setConnecting] = useState(false);
+  let [connected, setConnected] = useState(false);
   
   const HueState = (props) => {
 
@@ -125,9 +117,6 @@ function Set() {
 
   const LineStack = () => {
 
-    console.log(lines);
-
-
     return lines.map((light, index) => {
 
       return (
@@ -143,6 +132,33 @@ function Set() {
 
     })
 
+  }
+
+  const SetUpDialog = () => {
+
+    return !connected ? (
+      <Background>
+        <Modal>
+          <div>
+            <Connection>set up</Connection>
+            {
+              connecting ? 
+              <>
+                <Loading/>
+                <Message>{message}</Message>
+              </>
+              :
+              <>
+              <ConnectButton onClick={connect}>connect to Hue Bridge</ConnectButton>
+              <Later>set up later</Later>
+              </>
+            }
+          </div>
+        </Modal>
+      </Background>
+    ) 
+    : 
+    <></>
 
   }
 
@@ -195,20 +211,56 @@ function Set() {
       setRef = [...newLines];
       setLines([...newLines]);
       
-      
     }
   
   }
 
+  const connect = async () => {
+
+    setConnecting(true);
+
+    let ip = await getBridgeIP();
+
+    if(ip) {
+      console.log(ip);
+    } else {
+      return null;
+    }
+
+    setMessage('press link button on Hue Bridge');
+
+    let {connected, bridgeUser, bridgeIp} = await bridge.connect('');
+
+    console.log(connected, bridgeUser);
+
+    setUser({
+      ...user, 
+      bridgeUser: bridgeUser,
+      bridgeIp: bridgeIp
+    })
+
+    console.log('connecting')
+
+    bridge.loadLights(bridgeIp, bridgeUser).then(() => {
+      console.log('lights loaded')
+      setDidLoad(true);
+      setLines([...set]);
+    }).catch(err => {
+      console.log(err);
+    })
+    
+    setConnected(true);
+
+    return {connected, bridgeUser};
+
+  }
+
+
+
 
   return (
     <div className="Set">
-    <Background>
-      <Modal>
-        <div></div>
-      </Modal>
-    </Background>
-
+    <SetUpDialog/>
     <DragDropContext onDragEnd={onDragEnd}>
 
       <SetControls />
@@ -274,7 +326,65 @@ let Modal = styled.div`
         justify-content: center;
         align-items: center;
         flex-direction: column;
-
     }
 ` 
 
+let Connection = styled.h3`
+    margin-bottom: 30px;
+    position: absolute;
+    top: 30px;
+
+`
+
+let ConnectButton = styled.div`
+    background-color: rgba(0,255,255,0.7);
+    color: #fff;
+    height: 50px;
+    width: 200px;
+    border-radius: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    margin-bottom: 10px;
+    &:hover {
+        background-color: rgba(0,255,255,0.2);
+    }
+`
+
+let Later = styled.div`
+    cursor: pointer;
+    &:hover {
+      color: #777;
+    }
+`
+
+let loadingAnimation = keyframes`
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.5);
+    background-color: deeppink;
+  }
+  100% {
+    transform: scale(1);
+  }
+
+`
+
+let Loading = styled.div`
+    background-color: cyan;
+    position: absolute;
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    animation-name: ${loadingAnimation};
+    animation-duration: 1s;
+    animation-iteration-count: infinite;
+`
+
+let Message = styled.h3`
+    position: absolute;
+    bottom: 50px;
+`

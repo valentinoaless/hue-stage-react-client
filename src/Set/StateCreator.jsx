@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import './StateCreator.css';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 import styled from 'styled-components'
@@ -6,6 +6,7 @@ import { currentEditorState } from './data'
 import { bridge } from './bridge.js';
 import { set } from './data';
 import { State } from './state-model';
+import { UserContext } from '../UserContext';
 
 const ViewerContainer = styled.div`
         position: absolute;
@@ -30,6 +31,8 @@ const NewState = styled.div`
 `
 
 const StateCreator = (props) => {
+
+    let {user, setUser} = useContext(UserContext);
 
     let now = new Date();
 
@@ -57,19 +60,13 @@ const StateCreator = (props) => {
 
         e.preventDefault();
 
-        // const state = {
-        //     hue: Math.round(color.hue * 182.04166),
-        //     bri: Math.round(color.brightness/100 * 254),
-        //     sat: Math.round(color.saturation/100 * 254),
-        //     transitiontime: 1,
-        //     on: true
-        // }
+        
 
         let state = new State(color.hue, color.sat, color.bri);
 
-        // console.log(color);
+      
 
-        bridge.send(previewLight, state.data());
+        bridge.send(previewLight, state.data(), user.bridgeIp, user.bridgeUser);
 
     }
 
