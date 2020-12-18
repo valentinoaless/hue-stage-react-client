@@ -53,7 +53,7 @@ const App = () => {
 
         let authorized = false;
         
-        await axios.get('http://localhost:5000/api/user', {
+        await axios.get('https://hue-stage.herokuapp.com/api/user', {
             headers: {
                 auth_token: user_auth_token
             }

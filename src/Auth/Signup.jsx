@@ -55,7 +55,7 @@ const SignUp = () => {
     const submit = async (e) => {
         e.preventDefault();
         setLoading(true);
-        await axios.post('http://localhost:5000/api/user/register', credentials)
+        await axios.post('https://hue-stage.herokuapp.com/api/user/register', credentials)
             .then(res => {
                 console.log(res.data);
                 if(res.data === 'username is taken') {

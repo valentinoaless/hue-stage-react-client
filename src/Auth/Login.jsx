@@ -24,7 +24,7 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        await axios.post('http://localhost:5000/api/user/login', credentials)
+        await axios.post('https://hue-stage.herokuapp.com/api/user/login', credentials)
             .then(res => {
                 localStorage.setItem("user_auth_token", res.data);
                 setUser({

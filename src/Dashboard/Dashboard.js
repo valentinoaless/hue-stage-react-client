@@ -31,7 +31,7 @@ const Dashboard = () => {
 
     let loadUser = async () => {
 
-        await axios.get('http://localhost:5000/api/user/profile', {
+        await axios.get('https://hue-stage.herokuapp.com/api/user/profile', {
             headers: {auth_token: localStorage.getItem("user_auth_token")}
         }).then(res => {
             setUser({
