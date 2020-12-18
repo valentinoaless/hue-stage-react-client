@@ -8,7 +8,7 @@ export default class Light {
 }
 
 export class State {
-    constructor(hue, sat, bri, transitiontime=0, on=true, duration=1) {
+    constructor(hue, sat, bri, transitiontime=1, on=true, duration=1) {
         this.id = `state--id--${(new Date()).getTime()}`;
         this.hue = Math.round(hue * 182.04166);
         this.bri =  Math.round(bri/100 * 254);

@@ -7,6 +7,7 @@ import { bridge } from './bridge.js';
 import { set } from './data';
 import { State } from './state-model';
 import { UserContext } from '../UserContext';
+import CloseIcon from '../resources/clear-black-18dp.svg';
 
 const ViewerContainer = styled.div`
         position: absolute;
@@ -126,13 +127,15 @@ const StateCreator = (props) => {
         backgroundColor: `hsl(${color.hue},${color.sat}%,${(color.bri - color.sat*color.bri/200)}%)`,
         borderRadius: '5px',
         margin: '0px',
-        display: 'inline-block'
+        display: 'inline-block',
+        position: 'absolute',
+        float: 'top'
     }
 
     return (
         creatorVisibility ? 
         <div className="creator">
-            <div id="close-creator" onClick={toggleCreator}>X</div>
+            <div id="close-creator" onClick={toggleCreator}><img src={CloseIcon} width="30px" alt="close"/></div>
             <Droppable droppableId="viewer" type="STATE" isDropDisabled={true}>
                 {(provided,snapshot) => (
                     <ViewerContainer ref={provided.innerRef} {...provided.droppableProps} duration={duration * 100}>
@@ -150,6 +153,7 @@ const StateCreator = (props) => {
                     </ViewerContainer>
                 )}
             </Droppable>
+            <div className="inputs">
             <div className="lightPreview">
                 <form onSubmit={testState}>
                     <select name="select-light" id="select-light" onChange={selectLight}>
@@ -179,6 +183,7 @@ const StateCreator = (props) => {
             <div className="duration edit">
                 duration
                 <input className="duraton-input" name="duration-measure" type="number" min="1" placeholder="1" onChange={handleDurationChange}></input>
+            </div>
             </div>
 
         </div>
