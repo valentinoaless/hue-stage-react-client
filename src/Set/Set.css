@@ -1,0 +1,17 @@
+.Set {
+  background-color: #111;
+  padding: 10px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body, html {
+  background-color: #111;
+}
+
+.draggable-state {
+  background-color: rgba(0,0,0,0);
+}

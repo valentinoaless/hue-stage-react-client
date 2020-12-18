@@ -1,0 +1,50 @@
+.creator {
+    position: fixed;
+    height: 100vh;
+    top: 0px;
+    right: 0px;
+    width: 20vw;
+    padding-top: 10px;
+    background-color: white;
+    z-index: 6000;
+}
+
+#close-creator {
+    background-color: white;
+    border: none;
+    cursor: pointer;
+    display: inline;
+    padding: 10px;
+    float: right;
+}
+
+#close-creator:hover {
+    color: red;
+}
+
+#open-creator {
+    background-color: white;
+    border: none;
+    cursor: pointer;
+    display: inline;
+}
+
+.edit {
+    margin: 20px;
+}
+
+.edit input {
+    display: block;
+    margin-top: 10px;
+    margin-left: 0;
+}
+
+.validation-error {
+    color: red;
+}
+
+.lightPreview {
+    margin-top: 100px;
+}
+
+
